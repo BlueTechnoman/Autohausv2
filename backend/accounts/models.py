@@ -1,15 +1,16 @@
-from django.db import models
-
-# Create your models here.
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class User(AbstractUser):
+
     ROLE_CHOICES = [
         ("admin", "Admin"),
-        ("sales", "Verkäufer"),
-        ("workshop", "Werkstatt"),
+        ("employee", "Mitarbeiter"),
+        ("customer", "Kunde"),
     ]
 
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="sales")
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default="customer"
+    )
