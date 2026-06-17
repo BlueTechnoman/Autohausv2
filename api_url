@@ -1,0 +1,91 @@
+
+---
+
+# 🌐 🔐 Accounts (Login / User)
+
+```text id="api_acc"
+POST /api/accounts/register/     → Benutzer registrieren
+POST /api/accounts/login/        → JWT Login (access + refresh)
+POST /api/accounts/refresh/      → neuen access Token holen
+GET  /api/accounts/me/           → aktueller eingeloggter User
+```
+
+---
+
+# 👤 Customers
+
+```text id="api_cus"
+GET    /api/customers/           → alle Kunden
+POST   /api/customers/           → neuen Kunden erstellen
+GET    /api/customers/{id}/      → einzelner Kunde
+PUT    /api/customers/{id}/      → Kunde bearbeiten
+PATCH  /api/customers/{id}/      → teilweise ändern
+DELETE /api/customers/{id}/      → Kunde löschen
+```
+
+---
+
+# 💰 Sales
+
+```text id="api_sales"
+GET    /api/sales/               → alle Verkäufe
+POST   /api/sales/               → neuen Verkauf erstellen
+GET    /api/sales/{id}/          → einzelner Verkauf
+PUT    /api/sales/{id}/
+PATCH  /api/sales/{id}/
+DELETE /api/sales/{id}/
+```
+
+---
+
+# 🚗 Vehicles
+
+```text id="api_veh"
+GET    /api/vehicles/            → alle Fahrzeuge
+POST   /api/vehicles/            → Fahrzeug erstellen
+GET    /api/vehicles/{id}/       → einzelnes Fahrzeug
+PUT    /api/vehicles/{id}/
+PATCH  /api/vehicles/{id}/
+DELETE /api/vehicles/{id}/
+```
+
+---
+
+# 📅 Appointments
+
+```text id="api_app"
+GET    /api/appointments/
+POST   /api/appointments/
+GET    /api/appointments/{id}/
+PUT    /api/appointments/{id}/
+PATCH  /api/appointments/{id}/
+DELETE /api/appointments/{id}/
+```
+
+---
+
+# 📄 Documents
+
+```text id="api_doc"
+GET    /api/documents/
+POST   /api/documents/            → Datei Upload
+GET    /api/documents/{id}/
+DELETE /api/documents/{id}/
+```
+
+---
+
+# 🧠 Gesamtstruktur (Übersicht)
+
+```text id="api_all"
+API ROOT: /api/
+
+├── accounts/        🔐 Login + User
+├── customers/       👤 Kunden
+├── sales/           💰 Verkäufe
+├── vehicles/        🚗 Fahrzeuge
+├── appointments/    📅 Termine
+├── documents/       📄 Dateien
+```
+
+---
