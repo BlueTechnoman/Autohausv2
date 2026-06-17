@@ -1,13 +1,13 @@
 from django.db import models
 from django.conf import settings
 
-from django.db import models
-from django.conf import settings
 
 class Customer(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
 
     first_name = models.CharField(max_length=100)
@@ -19,10 +19,3 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-    
-user = models.OneToOneField(
-    settings.AUTH_USER_MODEL,
-    on_delete=models.CASCADE,
-    null=True,
-    blank=True
-)
