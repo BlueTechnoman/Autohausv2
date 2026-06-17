@@ -1,8 +1,21 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
+from .models import Appointment
+from .serializers import AppointmentSerializer
 
-from django.http import JsonResponse
 
-def test(request):
-    return JsonResponse({"message": "appointments works 🚀"})
+class AppointmentViewSet(ModelViewSet):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.role == "customer":
+            return Appointment.objects.filter(
+                customer__user=user
+            )
+
+        return Appointment.objects.all()
