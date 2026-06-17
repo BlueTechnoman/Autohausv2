@@ -1,28 +1,19 @@
-from django.contrib.auth import get_user_model
-from rest_framework import generics, permissions
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 
-from .serializers import RegisterSerializer
-
-User = get_user_model()
+from .models import Customer
+from .serializers import CustomerSerializer
 
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny]
+class CustomerViewSet(ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
 
-class MeView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+        if user.role == "customer":
+            return Customer.objects.filter(user=user)
 
-    def get(self, request):
-        user = request.user
-
-        return Response({
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "role": user.role,
-        })
+        return Customer.objects.all()
