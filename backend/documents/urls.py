@@ -1,6 +1,10 @@
-from django.urls import path
-from . import views
+from rest_framework.routers import DefaultRouter
+from .views import DocumentViewSet
 
-urlpatterns = [
-    path("", views.test, name="documents-test"),
-]
+router = DefaultRouter()
+router.register(
+    r"documents",
+    DocumentViewSet
+)
+
+urlpatterns = router.urls

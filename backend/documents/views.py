@@ -1,8 +1,11 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
+from .models import Document
+from .serializers import DocumentSerializer
 
-from django.http import JsonResponse
 
-def test(request):
-    return JsonResponse({"message": "documents works 🚀"})
+class DocumentViewSet(ModelViewSet):
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer
+    permission_classes = [IsAuthenticated]
