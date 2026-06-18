@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Q
 
-from .models import Vehicle
-from .serializers import VehicleSerializer
+from .models import Vehicle, VehicleImage
+from .serializers import VehicleSerializer, VehicleImageSerializer
 
 
 class VehicleViewSet(ModelViewSet):
@@ -45,3 +45,8 @@ class VehicleViewSet(ModelViewSet):
             )
 
         return queryset
+    
+
+class VehicleImageViewSet(ModelViewSet):
+    queryset = VehicleImage.objects.all()
+    serializer_class = VehicleImageSerializer

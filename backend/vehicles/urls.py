@@ -1,7 +1,16 @@
 from rest_framework.routers import DefaultRouter
-from .views import VehicleViewSet
+from .views import VehicleViewSet, VehicleImageViewSet
 
 router = DefaultRouter()
-router.register(r'vehicles', VehicleViewSet)
+
+router.register(
+    r"vehicles",
+    VehicleViewSet
+)
+
+router.register(
+    r"vehicle-images",
+    VehicleImageViewSet
+)
 
 urlpatterns = router.urls
