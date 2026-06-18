@@ -3,9 +3,17 @@ from .models import Sale
 from customers.serializers import CustomerSerializer
 from vehicles.serializers import VehicleSerializer
 
+
 class SaleSerializer(serializers.ModelSerializer):
-    customer_detail = CustomerSerializer(source="customer", read_only=True)
-    vehicle_detail = VehicleSerializer(source="vehicle", read_only=True)
+    customer_detail = CustomerSerializer(
+        source="customer",
+        read_only=True
+    )
+
+    vehicle_detail = VehicleSerializer(
+        source="vehicle",
+        read_only=True
+    )
 
     class Meta:
         model = Sale
@@ -19,3 +27,11 @@ class SaleSerializer(serializers.ModelSerializer):
             "customer_detail",
             "vehicle_detail",
         ]
+
+    def validate_vehicle(self, vehicle):
+        if vehicle.status == "sold":
+            raise serializers.ValidationError(
+                "Fahrzeug wurde bereits verkauft."
+            )
+
+        return vehicle

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'appointments',
     'documents',
     'rest_framework_simplejwt'
+    'dashboard',
 ]
 
 MIDDLEWARE = [
