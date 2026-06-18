@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'sales',
     'appointments',
     'documents',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
     'dashboard',
 ]
 
