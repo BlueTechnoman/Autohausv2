@@ -1,59 +1,128 @@
+Nach allem, was wir gebaut haben, solltest du ungefähr diese APIs haben:
+
+# 🔐 Accounts
+
+```text
+POST /api/accounts/register/
+```
+
+User registrieren
+
+```json
+{
+  "username": "max",
+  "email": "max@test.de",
+  "password": "123456",
+  "role": "customer"
+}
+```
 
 ---
 
-# 🌐 🔐 Accounts (Login / User)
-
-```text id="api_acc"
-POST /api/accounts/register/     → Benutzer registrieren
-POST /api/accounts/login/        → JWT Login (access + refresh)
-POST /api/accounts/refresh/      → neuen access Token holen
-GET  /api/accounts/me/           → aktueller eingeloggter User
+```text
+POST /api/accounts/login/
 ```
+
+JWT Token holen
+
+```json
+{
+  "username": "max",
+  "password": "max"
+}
+```
+
+---
+
+```text
+POST /api/accounts/token/refresh/
+```
+
+Token erneuern
+
+---
+
+```text
+GET /api/accounts/me/
+```
+
+Aktuell eingeloggten User anzeigen
 
 ---
 
 # 👤 Customers
 
-```text id="api_cus"
-GET    /api/customers/           → alle Kunden
-POST   /api/customers/           → neuen Kunden erstellen
-GET    /api/customers/{id}/      → einzelner Kunde
-PUT    /api/customers/{id}/      → Kunde bearbeiten
-PATCH  /api/customers/{id}/      → teilweise ändern
-DELETE /api/customers/{id}/      → Kunde löschen
-```
-
----
-
-# 💰 Sales
-
-```text id="api_sales"
-GET    /api/sales/               → alle Verkäufe
-POST   /api/sales/               → neuen Verkauf erstellen
-GET    /api/sales/{id}/          → einzelner Verkauf
-PUT    /api/sales/{id}/
-PATCH  /api/sales/{id}/
-DELETE /api/sales/{id}/
+```text
+GET    /api/customers/
+POST   /api/customers/
+GET    /api/customers/{id}/
+PUT    /api/customers/{id}/
+PATCH  /api/customers/{id}/
+DELETE /api/customers/{id}/
 ```
 
 ---
 
 # 🚗 Vehicles
 
-```text id="api_veh"
-GET    /api/vehicles/            → alle Fahrzeuge
-POST   /api/vehicles/            → Fahrzeug erstellen
-GET    /api/vehicles/{id}/       → einzelnes Fahrzeug
+```text
+GET    /api/vehicles/
+POST   /api/vehicles/
+GET    /api/vehicles/{id}/
 PUT    /api/vehicles/{id}/
 PATCH  /api/vehicles/{id}/
 DELETE /api/vehicles/{id}/
 ```
 
+### Suche
+
+```text
+/api/vehicles/?brand=BWM
+/api/vehicles/?model=M4
+/api/vehicles/?status=available
+/api/vehicles/?year=2026
+/api/vehicles/?search=BWM
+/api/vehicles/?search=M4
+```
+
+---
+
+# 📸 Vehicle Images
+
+(falls du die Galerie eingebaut hast)
+
+```text
+GET    /api/vehicle-images/
+POST   /api/vehicle-images/
+GET    /api/vehicle-images/{id}/
+PUT    /api/vehicle-images/{id}/
+DELETE /api/vehicle-images/{id}/
+```
+
+---
+
+# 💰 Sales
+
+```text
+GET    /api/sales/
+POST   /api/sales/
+GET    /api/sales/{id}/
+PUT    /api/sales/{id}/
+PATCH  /api/sales/{id}/
+DELETE /api/sales/{id}/
+```
+
+Besonderheiten:
+
+✅ Fahrzeug wird automatisch auf `sold` gesetzt
+
+✅ Bereits verkaufte Fahrzeuge können nicht erneut verkauft werden
+
 ---
 
 # 📅 Appointments
 
-```text id="api_app"
+```text
 GET    /api/appointments/
 POST   /api/appointments/
 GET    /api/appointments/{id}/
@@ -66,26 +135,40 @@ DELETE /api/appointments/{id}/
 
 # 📄 Documents
 
-```text id="api_doc"
+```text
 GET    /api/documents/
-POST   /api/documents/            → Datei Upload
+POST   /api/documents/
 GET    /api/documents/{id}/
+PUT    /api/documents/{id}/
+PATCH  /api/documents/{id}/
 DELETE /api/documents/{id}/
 ```
 
----
+Dokumenttypen:
 
-# 🧠 Gesamtstruktur (Übersicht)
-
-```text id="api_all"
-API ROOT: /api/
-
-├── accounts/        🔐 Login + User
-├── customers/       👤 Kunden
-├── sales/           💰 Verkäufe
-├── vehicles/        🚗 Fahrzeuge
-├── appointments/    📅 Termine
-├── documents/       📄 Dateien
+```text
+contract
+invoice
+id_card
+vehicle_doc
+other
 ```
 
 ---
+
+# 📊 Dashboard
+
+```text
+GET /api/dashboard/
+```
+
+Aktuell ungefähr:
+
+```json
+{
+  "customers": 5,
+  "vehicles": 12,
+  "sales": 4,
+  "appointments": 2,
+  "documents": 9
+}
