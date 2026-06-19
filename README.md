@@ -2,20 +2,5 @@
 
 
 Rest macht das Frontend 
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
+dasd
 die sind ja zu 3
