@@ -520,10 +520,10 @@ function resetFilters() {
           <div>
             <p class="text-[#D41C1C] font-bold text-xs uppercase tracking-[0.2em] mb-4">Über uns</p>
             <h2 class="text-white font-bold text-4xl leading-tight mb-6">
-              Seit 2009 Ihr<br />verlässlicher Partner.
+              Seit 2014 Ihr<br />verlässlicher Partner.
             </h2>
             <p class="text-white/65 text-base leading-relaxed mb-8">
-              AutoHaus Müller steht seit über 15 Jahren für Seriosität, Transparenz und erstklassigen Service im Fahrzeughandel. Ob gepflegter Jahreswagen oder Familienauto — wir begleiten Sie vom ersten Gespräch bis zur Übergabe.
+              AutoHaus Müller steht seit über 10 Jahren für Seriosität, Transparenz und erstklassigen Service im Fahrzeughandel. Ob gepflegter Jahreswagen oder Familienauto — wir begleiten Sie vom ersten Gespräch bis zur Übergabe.
             </p>
             <ul class="space-y-3.5">
               <li
