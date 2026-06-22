@@ -99,7 +99,7 @@ const NAV_LINKS: [string, string][] = [
 
 const STATS: [string, string][] = [
   ['80+', 'Fahrzeuge im Bestand'],
-  ['15 J.', 'Erfahrung'],
+  ['14 J.', 'Erfahrung'],
   ['4,9 ★', 'Kundenbewertung'],
 ]
 
