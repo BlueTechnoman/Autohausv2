@@ -225,7 +225,7 @@ function resetFilters() {
             </div>
             <div class="text-left">
               <div class="font-bold text-[#0F2044] text-base leading-none">AutoHaus Müller</div>
-              <div class="text-[10px] text-[#6B7585] leading-none mt-0.5 uppercase tracking-wider">München</div>
+              <div class="text-[10px] text-[#6B7585] leading-none mt-0.5 uppercase tracking-wider">Bayreuth</div>
             </div>
           </button>
 
@@ -248,7 +248,7 @@ function resetFilters() {
               class="flex items-center gap-2 text-[#0F2044] font-semibold text-sm hover:text-[#D41C1C] transition-colors"
             >
               <Phone :size="14" />
-              089 123 456 789
+              0921 123 456 789
             </a>
             <button
               @click="scrollTo('fahrzeuge')"
@@ -296,7 +296,7 @@ function resetFilters() {
           class="flex items-center gap-2 text-[#0F2044] font-semibold py-2.5 text-sm"
         >
           <Phone :size="14" />
-          089 123 456 789
+          0921 123 456 789
         </a>
       </div>
     </nav>
@@ -315,7 +315,7 @@ function resetFilters() {
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
         <div class="max-w-2xl">
           <p class="text-[#D41C1C] font-bold text-xs uppercase tracking-[0.2em] mb-5">
-            Ihr Autohaus in München
+            Ihr Autohaus in Bayreuth
           </p>
           <h1
             class="text-white font-bold leading-[1.1] mb-6"
@@ -570,8 +570,8 @@ function resetFilters() {
             </div>
             <h3 class="text-[#0F2044] font-bold text-base mb-3">Adresse</h3>
             <p class="text-[#6B7585] text-sm leading-relaxed">
-              Maximilianstraße 18<br />
-              80539 München<br />
+              Amselweg 18<br />
+              95445 Bayreuth <br />
               Deutschland
             </p>
           </div>
@@ -584,7 +584,7 @@ function resetFilters() {
             <h3 class="text-[#0F2044] font-bold text-base mb-3">Telefon & E-Mail</h3>
             <p class="text-[#6B7585] text-sm leading-relaxed mb-5">
               <a href="tel:+4989123456789" class="hover:text-[#D41C1C] transition-colors block">
-                089 123 456 789
+                0921 123 456 789
               </a>
               <a href="mailto:info@autohaus-mueller.de" class="hover:text-[#D41C1C] transition-colors block mt-1">
                 info@autohaus-mueller.de
@@ -632,7 +632,7 @@ function resetFilters() {
           </div>
 
           <p class="text-white/35 text-xs order-last md:order-none">
-            © 2024 AutoHaus Müller GmbH · Alle Rechte vorbehalten
+            © 2026 AutoHaus Müller GmbH · Alle Rechte vorbehalten
           </p>
 
           <div class="flex items-center gap-6">
