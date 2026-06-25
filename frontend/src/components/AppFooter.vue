@@ -1,9 +1,10 @@
 <script setup lang="ts">
-const FOOTER_LINKS = ['Impressum', 'Datenschutz', 'AGB']
+import { RouterLink } from 'vue-router'
+const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="bg-[#07152E] py-8">
+  <footer class="bg-[#2d3748] py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row items-center justify-between gap-5">
 
@@ -17,18 +18,29 @@ const FOOTER_LINKS = ['Impressum', 'Datenschutz', 'AGB']
 
         <!-- Copyright -->
         <p class="text-white/35 text-xs order-last md:order-none">
-          © 2024 AutoHaus Müller GmbH · Alle Rechte vorbehalten
+          © {{ year }} AutoHaus Müller GmbH · Alle Rechte vorbehalten
         </p>
 
         <!-- Links -->
         <div class="flex items-center gap-6">
-          <button
-            v-for="link in FOOTER_LINKS"
-            :key="link"
+          <RouterLink
+            to="/impressum"
             class="text-white/45 hover:text-white/80 text-sm transition-colors"
           >
-            {{ link }}
-          </button>
+            Impressum
+          </RouterLink>
+          <RouterLink
+            to="/datenschutz"
+            class="text-white/45 hover:text-white/80 text-sm transition-colors"
+          >
+            Datenschutz
+          </RouterLink>
+          <RouterLink
+            to="/"
+            class="text-white/45 hover:text-white/80 text-sm transition-colors"
+          >
+            AGB
+          </RouterLink>
         </div>
 
       </div>
