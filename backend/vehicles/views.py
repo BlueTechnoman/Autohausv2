@@ -1,13 +1,23 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 from django.db.models import Q
 
 from .models import Vehicle, VehicleImage
 from .serializers import VehicleSerializer, VehicleImageSerializer
 
 
+class IsAuthenticatedOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+
+        return request.user and request.user.is_authenticated
+
+
 class VehicleViewSet(ModelViewSet):
     serializer_class = VehicleSerializer
     queryset = Vehicle.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         queryset = Vehicle.objects.all()
@@ -50,3 +60,4 @@ class VehicleViewSet(ModelViewSet):
 class VehicleImageViewSet(ModelViewSet):
     queryset = VehicleImage.objects.all()
     serializer_class = VehicleImageSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
