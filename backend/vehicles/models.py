@@ -113,8 +113,9 @@ class VehicleImage(models.Model):
         related_name="images"
     )
 
-    image = models.ImageField(
-        upload_to="vehicles/"
+    image_url = models.URLField(
+        max_length=500,
+        verbose_name="Bild-URL"
     )
 
     uploaded_at = models.DateTimeField(
