@@ -143,6 +143,8 @@ export function useAuth() {
       refreshToken.value = data.refresh
       localStorage.setItem('auth_access',  data.access)
       localStorage.setItem('auth_refresh', data.refresh)
+      await fetchCurrentUser()
+      if (user.value) localStorage.setItem('auth_user', JSON.stringify(user.value))
 
       // User-Daten laden
       await fetchCurrentUser()
