@@ -6,7 +6,7 @@ import CookieBanner from './components/CookieBanner.vue'
 
 const { text, visible } = useNotification()
 
-// ── Konami Code Easter Egg ────────────────────────────────────────────
+// Konami Code Sonic Easter Egg 
 const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
                 'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
 const progress    = ref(0)
