@@ -65,7 +65,7 @@ const STATS: [string, string][] = [
 
         <!-- Untertext -->
         <p class="text-white/70 text-lg leading-relaxed mb-10 max-w-lg">
-          Über 80 geprüfte Gebrauchtwagen — transparent bepreist,
+          Über 80 geprüfte Gebrauchtwagen - transparent bepreist,
           professionell aufbereitet, sofort verfügbar.
         </p>
 

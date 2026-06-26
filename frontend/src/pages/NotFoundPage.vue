@@ -34,6 +34,15 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           Vielleicht haben Sie sich vertippt?
         </p>
 
+        <!-- Sonic Easter Egg -->
+        <img
+          src="/sonic/sonic_shakinghead.gif"
+          alt=""
+          class="mx-auto mb-6 w-16 h-16"
+          style="image-rendering: pixelated"
+        />
+        <p class="text-[#8e9aaa] text-xs -mt-4 mb-6">Sonic findet sie aber auch nicht.</p>
+
         <div class="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             @click="router.back()"

@@ -88,8 +88,8 @@ function saveSelection() {
           >
             <span
               :class="[
-                'absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform',
-                localAnalytics ? 'translate-x-5' : 'translate-x-0.5',
+                'absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200',
+                localAnalytics ? 'left-[22px]' : 'left-[2px]',
               ]"
             />
           </button>

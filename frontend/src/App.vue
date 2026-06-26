@@ -1,9 +1,41 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterView } from 'vue-router'
 import { useNotification } from './composables/useNotification'
 import CookieBanner from './components/CookieBanner.vue'
 
 const { text, visible } = useNotification()
+
+// ── Konami Code Easter Egg ────────────────────────────────────────────
+// Eingabe: ↑ ↑ ↓ ↓ ← → ← → B A → Sonic rennt über den Bildschirm
+const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
+                'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
+const progress    = ref(0)
+const sonicActive = ref(false)
+const sonicPhase  = ref<'slow'|'fast'>('slow')
+
+function onKeyDown(e: KeyboardEvent) {
+  if (e.key === KONAMI[progress.value]) {
+    progress.value++
+    if (progress.value === KONAMI.length) {
+      progress.value = 0
+      triggerSonic()
+    }
+  } else {
+    progress.value = 0
+  }
+}
+
+function triggerSonic() {
+  if (sonicActive.value) return
+  sonicActive.value = true
+  sonicPhase.value  = 'slow'
+  setTimeout(() => { sonicPhase.value = 'fast' }, 2000)
+  setTimeout(() => { sonicActive.value = false  }, 5000)
+}
+
+onMounted(()  => window.addEventListener('keydown', onKeyDown))
+onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
 </script>
 
 <template>
@@ -25,8 +57,33 @@ const { text, visible } = useNotification()
     </div>
 
     <RouterView />
-
     <CookieBanner />
+
+    <!-- Sonic Easter Egg: erscheint nach Konami-Code ↑↑↓↓←→←→BA -->
+    <div
+      v-if="sonicActive"
+      class="fixed bottom-6 z-[9999] pointer-events-none sonic-run"
+    >
+      <img
+        :src="sonicPhase === 'slow'
+          ? '/sonic/sonic_running_slow.gif'
+          : '/sonic/sonic_running_fast.gif'"
+        alt=""
+        style="image-rendering: pixelated; width: 64px; height: 64px;"
+      />
+    </div>
 
   </div>
 </template>
+
+<style scoped>
+/* Sonic rennt von rechts nach links in 5 Sekunden, gespiegelt */
+.sonic-run {
+  animation: sonic-across 5s linear forwards;
+  transform: scaleX(-1);
+}
+@keyframes sonic-across {
+  from { right: -80px; }
+  to   { right: 110vw; }
+}
+</style>

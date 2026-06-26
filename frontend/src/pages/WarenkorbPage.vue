@@ -113,8 +113,8 @@ function submitOrder() {
     <div class="bg-white border-b border-[#1a2e5a]/8">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <nav class="flex items-center gap-2 text-xs text-[#8e9aaa] mb-4">
-          <button @click="router.push('/')" class="hover:text-[#e85c1a] transition-colors">Startseite</button>
-          <span>/</span>
+          <button @click="router.push('/')" class="hover:text-[#e85c1a] transition-colors font-medium">Startseite</button>
+          <span class="text-[#8e9aaa]/50">/</span>
           <span class="text-[#1a2e5a] font-semibold">Warenkorb</span>
         </nav>
         <h1 class="text-[#1a2e5a] font-bold text-2xl">Ihr Warenkorb</h1>

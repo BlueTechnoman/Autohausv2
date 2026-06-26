@@ -25,7 +25,7 @@ const PUNKTE = [
           </h2>
           <p class="text-white/65 text-base leading-relaxed mb-8">
             AutoHaus Müller steht seit über 15 Jahren für Seriosität, Transparenz und erstklassigen
-            Service im Fahrzeughandel. Ob gepflegter Jahreswagen oder Familienauto — wir begleiten
+            Service im Fahrzeughandel. Ob gepflegter Jahreswagen oder Familienauto - wir begleiten
             Sie vom ersten Gespräch bis zur Übergabe.
           </p>
           <ul class="space-y-3.5 mb-8">

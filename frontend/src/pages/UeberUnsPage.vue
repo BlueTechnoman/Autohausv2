@@ -61,7 +61,7 @@ const WERTE = [
   {
     icon: Shield,
     titel: 'Vertrauen & Transparenz',
-    text: 'Jedes Fahrzeug wird vollständig dokumentiert — mit lückenlosem Servicehistorie, HU-Bericht und ehrlicher Zustandsbeschreibung. Keine versteckten Kosten.',
+    text: 'Jedes Fahrzeug wird vollständig dokumentiert - mit lückenlosem Servicehistorie, HU-Bericht und ehrlicher Zustandsbeschreibung. Keine versteckten Kosten.',
   },
   {
     icon: Award,
@@ -120,10 +120,10 @@ const LEISTUNGEN = [
       </div>
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Breadcrumb -->
-        <nav class="flex items-center gap-2 text-white/40 text-xs mb-8">
-          <button @click="router.push('/')" class="hover:text-white/70 transition-colors">Startseite</button>
-          <span>/</span>
-          <span class="text-white/70">Über uns</span>
+        <nav class="flex items-center gap-2 text-white/50 text-xs font-medium mb-8 tracking-wide">
+          <button @click="router.push('/')" class="hover:text-white/80 transition-colors font-medium">Startseite</button>
+           <span class="text-white/30">/</span>
+           <span class="text-white/80 font-semibold">Über uns</span>
         </nav>
         <p class="text-[#e85c1a] font-bold text-xs uppercase tracking-[0.2em] mb-4">Wer wir sind</p>
         <h1 class="text-white font-bold text-4xl md:text-5xl leading-tight mb-6">
@@ -160,7 +160,7 @@ const LEISTUNGEN = [
           <p class="text-[#e85c1a] font-bold text-xs uppercase tracking-[0.2em] mb-3">Unsere Geschichte</p>
           <h2 class="text-[#1a2e5a] font-bold text-3xl mb-4">15 Jahre AutoHaus Müller</h2>
           <p class="text-[#8e9aaa] text-base leading-relaxed">
-            Von einem kleinen Gebrauchtwagenhändler zu einem der bekanntesten Autohäuser Bayreuths —
+            Von einem kleinen Gebrauchtwagenhändler zu einem der bekanntesten Autohäuser Bayreuths -
             unsere Geschichte ist geprägt von Leidenschaft, Vertrauen und kontinuierlichem Wachstum.
           </p>
         </div>
@@ -257,7 +257,7 @@ const LEISTUNGEN = [
             <p class="text-[#e85c1a] font-bold text-xs uppercase tracking-[0.2em] mb-3">Was wir bieten</p>
             <h2 class="text-[#1a2e5a] font-bold text-3xl mb-6">Unsere Leistungen</h2>
             <p class="text-[#8e9aaa] text-base leading-relaxed mb-8">
-              Von der ersten Beratung über den Kauf bis hin zur laufenden Betreuung —
+              Von der ersten Beratung über den Kauf bis hin zur laufenden Betreuung -
               wir sind Ihr Ansprechpartner für alles rund ums Fahrzeug.
             </p>
             <ul class="grid grid-cols-1 gap-3">

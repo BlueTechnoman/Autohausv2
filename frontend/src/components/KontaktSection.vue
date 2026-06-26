@@ -14,7 +14,7 @@ const OEFFNUNGSZEITEN: [string, string][] = [
 
       <div class="mb-10">
         <h2 class="text-[#1a2e5a] text-3xl font-bold mb-1">Kontakt & Anfahrt</h2>
-        <p class="text-[#8e9aaa] text-sm">Wir freuen uns auf Ihren Besuch — persönlich oder telefonisch.</p>
+        <p class="text-[#8e9aaa] text-sm">Wir freuen uns auf Ihren Besuch - persönlich oder telefonisch.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
