@@ -154,7 +154,7 @@ const inputCls = (err: boolean) => [
               <label class="block text-[#1a2e5a] text-xs font-bold uppercase tracking-wider mb-2">Benutzername</label>
               <div class="relative">
                 <User :size="15" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8e9aaa]" />
-                <input v-model="loginUsername" type="text" placeholder="IhrBenutzername"
+                <input v-model="loginUsername" type="text" placeholder="Ihr Benutzername"
                   :class="inputCls(false)" class="pl-10"
                   @keyup.enter="submitLogin" />
               </div>
