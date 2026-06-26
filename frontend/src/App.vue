@@ -7,12 +7,47 @@ import CookieBanner from './components/CookieBanner.vue'
 const { text, visible } = useNotification()
 
 // ── Konami Code Easter Egg ────────────────────────────────────────────
-// Eingabe: ↑ ↑ ↓ ↓ ← → ← → B A → Sonic rennt über den Bildschirm
 const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
                 'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
 const progress    = ref(0)
 const sonicActive = ref(false)
 const sonicPhase  = ref<'start'|'slow'|'fast'>('start')
+const sonicRight  = ref(-80)
+
+let animFrame: number
+let startTime: number
+
+// Geschwindigkeit pro Phase in px/sekunde
+const SPEED = { start: 60, slow: 120, fast: 600 }
+
+function animate(ts: number) {
+  if (!startTime) startTime = ts
+  const elapsed = (ts - startTime) / 1000
+
+  // start: 0 – 2500ms | slow: 2500 – 7000ms | fast: 7000ms+
+  if (elapsed < 2.5)      sonicPhase.value = 'start'
+  else if (elapsed < 5.0) sonicPhase.value = 'slow'
+  else                    sonicPhase.value = 'fast'
+
+  const speed = SPEED[sonicPhase.value]
+  sonicRight.value += speed * (1 / 60)
+
+  if (sonicRight.value > window.innerWidth + 80) {
+    sonicActive.value = false
+    sonicRight.value  = -80
+    return
+  }
+  animFrame = requestAnimationFrame(animate)
+}
+
+function triggerSonic() {
+  if (sonicActive.value) return
+  sonicActive.value = true
+  sonicPhase.value  = 'start'
+  sonicRight.value  = -80
+  startTime         = 0
+  animFrame         = requestAnimationFrame(animate)
+}
 
 function onKeyDown(e: KeyboardEvent) {
   if (e.key === KONAMI[progress.value]) {
@@ -26,20 +61,11 @@ function onKeyDown(e: KeyboardEvent) {
   }
 }
 
-function triggerSonic() {
-  if (sonicActive.value) return
-  sonicActive.value = true
-  sonicPhase.value  = 'start'
-  // Nach 1.5s: läuft
-  setTimeout(() => { sonicPhase.value = 'slow' }, 1500)
-  // Nach 3s: rennt schnell
-  setTimeout(() => { sonicPhase.value = 'fast' }, 3000)
-  // Nach 6s: verschwindet
-  setTimeout(() => { sonicActive.value = false  }, 6000)
-}
-
 onMounted(()  => window.addEventListener('keydown', onKeyDown))
-onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDown)
+  cancelAnimationFrame(animFrame)
+})
 </script>
 
 <template>
@@ -63,10 +89,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
     <RouterView />
     <CookieBanner />
 
-    <!-- Sonic Easter Egg: erscheint nach Konami-Code ↑↑↓↓←→←→BA -->
+    <!-- Sonic Easter Egg: kommt von rechts, läuft nach links -->
     <div
       v-if="sonicActive"
-      class="fixed bottom-6 z-[9999] pointer-events-none sonic-run"
+      class="fixed bottom-6 z-[9999] pointer-events-none"
+      :style="{ right: sonicRight + 'px' }"
     >
       <img
         :src="sonicPhase === 'start'
@@ -83,13 +110,5 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
 </template>
 
 <style scoped>
-/* Sonic rennt von rechts nach links in 6 Sekunden, gespiegelt */
-.sonic-run {
-  animation: sonic-across 6s linear forwards;
-  transform: scaleX(-1);
-}
-@keyframes sonic-across {
-  from { right: -80px; }
-  to   { right: 110vw; }
-}
+/* Position wird per JavaScript gesteuert – kein CSS-Animation */
 </style>
