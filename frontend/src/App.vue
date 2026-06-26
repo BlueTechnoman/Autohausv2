@@ -12,7 +12,7 @@ const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
                 'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
 const progress    = ref(0)
 const sonicActive = ref(false)
-const sonicPhase  = ref<'slow'|'fast'>('slow')
+const sonicPhase  = ref<'start'|'slow'|'fast'>('start')
 
 function onKeyDown(e: KeyboardEvent) {
   if (e.key === KONAMI[progress.value]) {
@@ -29,9 +29,13 @@ function onKeyDown(e: KeyboardEvent) {
 function triggerSonic() {
   if (sonicActive.value) return
   sonicActive.value = true
-  sonicPhase.value  = 'slow'
-  setTimeout(() => { sonicPhase.value = 'fast' }, 2000)
-  setTimeout(() => { sonicActive.value = false  }, 5000)
+  sonicPhase.value  = 'start'
+  // Nach 1.5s: läuft
+  setTimeout(() => { sonicPhase.value = 'slow' }, 1500)
+  // Nach 3s: rennt schnell
+  setTimeout(() => { sonicPhase.value = 'fast' }, 3000)
+  // Nach 6s: verschwindet
+  setTimeout(() => { sonicActive.value = false  }, 6000)
 }
 
 onMounted(()  => window.addEventListener('keydown', onKeyDown))
@@ -65,7 +69,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
       class="fixed bottom-6 z-[9999] pointer-events-none sonic-run"
     >
       <img
-        :src="sonicPhase === 'slow'
+        :src="sonicPhase === 'start'
+          ? '/sonic/sonic_running_start.gif'
+          : sonicPhase === 'slow'
           ? '/sonic/sonic_running_slow.gif'
           : '/sonic/sonic_running_fast.gif'"
         alt=""
@@ -77,9 +83,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
 </template>
 
 <style scoped>
-/* Sonic rennt von rechts nach links in 5 Sekunden, gespiegelt */
+/* Sonic rennt von rechts nach links in 6 Sekunden, gespiegelt */
 .sonic-run {
-  animation: sonic-across 5s linear forwards;
+  animation: sonic-across 6s linear forwards;
   transform: scaleX(-1);
 }
 @keyframes sonic-across {
