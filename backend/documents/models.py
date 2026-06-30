@@ -1,3 +1,5 @@
+#Hier wird die Datenbankstruktur der Anwendung für die Datenbank deffiniert (RH, NW)
+
 from django.db import models
 from customers.models import Customer
 
