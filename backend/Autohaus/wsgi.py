@@ -1,3 +1,5 @@
+#wsgi.py ist die Datei, über die deine Django-Anwendung mit einem WSGI-Server (Web Server Gateway) gestartet und betrieben wird. (RH, NW)
+
 """
 WSGI config for Autohaus project.
 

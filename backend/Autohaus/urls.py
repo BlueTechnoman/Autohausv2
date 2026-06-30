@@ -1,3 +1,5 @@
+##Hier wird festgelegt welcher Code  zu welcher aufgerufenen URL gehört (RH, NW)
+
 """
 URL configuration for Autohaus project.
 

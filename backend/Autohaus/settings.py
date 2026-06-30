@@ -1,3 +1,7 @@
+#settings.py ist die zentrale Konfigurationsdatei eines Django-Projekts. Dort legst du fest, wie deine gesamte Anwendung funktioniert.
+#(RH, NW)
+
+
 """
 Django settings for Autohaus project.
 
