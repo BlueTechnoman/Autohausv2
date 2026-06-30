@@ -1,3 +1,4 @@
+#Hier wird das Python-Objekt in eine JSON umgewandelt und andersrum (RH, NW)
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 

@@ -1,3 +1,6 @@
+#Hier wird die Logik der Anwendung festgelegt. Eine View verarbeitet eine Anfrage, 
+#führt dann den benötigten Code aus und gibt eine Antwort (RH, NW)
+
 from django.contrib.auth import get_user_model
 from rest_framework import generics, permissions, serializers
 from rest_framework.views import APIView

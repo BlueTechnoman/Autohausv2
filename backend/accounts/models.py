@@ -1,3 +1,4 @@
+#Hier wird die Datenbankstruktur der Anwendung für die Datenbank deffiniert (RH, NW)
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 

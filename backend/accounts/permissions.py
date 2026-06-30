@@ -1,3 +1,4 @@
+#Hier wird festgelegt wer auf welche API zugreifen darf (RH, NW)
 from rest_framework.permissions import BasePermission
 
 class IsEmployee(BasePermission):
