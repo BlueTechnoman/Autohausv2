@@ -128,3 +128,128 @@ class SaleCreateTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         vehicle.refresh_from_db()
         self.assertEqual(vehicle.status, "sold")
+
+
+class CheckoutTests(APITestCase):
+    """Tests für POST /api/sales/checkout/ - der eigentliche Warenkorb-Checkout."""
+
+    url = "/api/sales/checkout/"
+
+    def setUp(self):
+        self.customer_user = User.objects.create_user(
+            username="checkoutkunde", password="testpasswort123", role="customer"
+        )
+        self.vehicle1 = make_vehicle(brand="BMW", model="320d")
+        self.vehicle2 = make_vehicle(brand="Audi", model="A4")
+
+    def test_checkout_requires_authentication(self):
+        response = self.client.post(self.url, {"vehicle_ids": [self.vehicle1.id]})
+
+        self.assertIn(
+            response.status_code,
+            (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN),
+        )
+        self.assertEqual(Sale.objects.count(), 0)
+
+    def test_checkout_with_empty_cart_is_rejected(self):
+        self.client.force_authenticate(user=self.customer_user)
+
+        response = self.client.post(self.url, {"vehicle_ids": []})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Sale.objects.count(), 0)
+
+    def test_checkout_creates_one_sale_per_vehicle(self):
+        self.client.force_authenticate(user=self.customer_user)
+
+        response = self.client.post(self.url, {
+            "vehicle_ids": [self.vehicle1.id, self.vehicle2.id],
+            "phone": "0151234567",
+        })
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Sale.objects.count(), 2)
+        self.assertIn("order_number", response.data)
+        self.assertEqual(len(response.data["sales"]), 2)
+
+        # Beide Sale-Zeilen teilen sich dieselbe order_number
+        order_numbers = set(Sale.objects.values_list("order_number", flat=True))
+        self.assertEqual(len(order_numbers), 1)
+
+    def test_checkout_creates_customer_profile_if_missing(self):
+        self.assertFalse(Customer.objects.filter(user=self.customer_user).exists())
+        self.client.force_authenticate(user=self.customer_user)
+
+        self.client.post(self.url, {
+            "vehicle_ids": [self.vehicle1.id],
+            "phone": "0151234567",
+        })
+
+        customer = Customer.objects.get(user=self.customer_user)
+        self.assertEqual(customer.phone, "0151234567")
+
+    def test_checkout_reserves_vehicles(self):
+        self.client.force_authenticate(user=self.customer_user)
+
+        self.client.post(self.url, {
+            "vehicle_ids": [self.vehicle1.id],
+            "phone": "0151234567",
+        })
+
+        self.vehicle1.refresh_from_db()
+        self.assertEqual(self.vehicle1.status, "reserved")
+
+    def test_checkout_rejects_already_reserved_vehicle(self):
+        self.vehicle1.status = "reserved"
+        self.vehicle1.save()
+        self.client.force_authenticate(user=self.customer_user)
+
+        response = self.client.post(self.url, {
+            "vehicle_ids": [self.vehicle1.id],
+            "phone": "0151234567",
+        })
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Sale.objects.count(), 0)
+
+    def test_checkout_is_all_or_nothing(self):
+        """
+        Warenkorb mit einem verfügbaren und einem bereits verkauften
+        Fahrzeug: darf GAR NICHTS anlegen, nicht nur teilweise.
+        """
+        self.vehicle2.status = "sold"
+        self.vehicle2.save()
+        self.client.force_authenticate(user=self.customer_user)
+
+        response = self.client.post(self.url, {
+            "vehicle_ids": [self.vehicle1.id, self.vehicle2.id],
+            "phone": "0151234567",
+        })
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Sale.objects.count(), 0)
+        self.vehicle1.refresh_from_db()
+        self.assertEqual(self.vehicle1.status, "available")
+
+    def test_checkout_with_unknown_vehicle_id_is_rejected(self):
+        self.client.force_authenticate(user=self.customer_user)
+
+        response = self.client.post(self.url, {
+            "vehicle_ids": [999999],
+            "phone": "0151234567",
+        })
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Sale.objects.count(), 0)
+
+    def test_second_checkout_reuses_existing_customer_profile(self):
+        self.client.force_authenticate(user=self.customer_user)
+
+        # Erster Checkout legt das Customer-Profil an
+        self.client.post(self.url, {"vehicle_ids": [self.vehicle1.id], "phone": "0151234567"})
+        self.assertEqual(Customer.objects.filter(user=self.customer_user).count(), 1)
+
+        # Zweiter Checkout darf KEIN zweites Profil anlegen
+        self.client.post(self.url, {"vehicle_ids": [self.vehicle2.id]})
+        self.assertEqual(Customer.objects.filter(user=self.customer_user).count(), 1)
+        self.assertEqual(Sale.objects.filter(customer__user=self.customer_user).count(), 2)

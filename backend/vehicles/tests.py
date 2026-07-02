@@ -206,3 +206,121 @@ class VehicleWritePermissionTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Vehicle.objects.filter(id=vehicle.id).exists())
+
+
+class VehicleValidationTests(APITestCase):
+    """
+    Tests für die serverseitige Wertebereichsprüfung: Preis, Baujahr,
+    Kilometerstand, Leistung und Türanzahl duerfen keine unsinnigen
+    Werte annehmen (z.B. negativer Preis, Baujahr 1500, ...).
+    """
+
+    url = "/api/vehicles/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="mitarbeiter3", password="testpasswort123", role="employee"
+        )
+        self.client.force_authenticate(user=self.user)
+        self.base_payload = {
+            "brand": "Opel",
+            "model": "Astra",
+            "year": 2020,
+            "mileage": 50000,
+            "price": "15900.00",
+            "status": "available",
+        }
+
+    def test_negative_price_is_rejected(self):
+        payload = {**self.base_payload, "price": "-100.00"}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("price", response.data["details"])
+
+    def test_zero_price_is_rejected(self):
+        payload = {**self.base_payload, "price": "0.00"}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("price", response.data["details"])
+
+    def test_year_too_old_is_rejected(self):
+        payload = {**self.base_payload, "year": 1500}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("year", response.data["details"])
+
+    def test_year_too_far_in_future_is_rejected(self):
+        payload = {**self.base_payload, "year": 2999}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("year", response.data["details"])
+
+    def test_negative_mileage_is_rejected(self):
+        payload = {**self.base_payload, "mileage": -1}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("mileage", response.data["details"])
+
+    def test_unrealistic_mileage_is_rejected(self):
+        payload = {**self.base_payload, "mileage": 5_000_000}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("mileage", response.data["details"])
+
+    def test_zero_leistung_is_rejected(self):
+        payload = {**self.base_payload, "leistung": 0}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("leistung", response.data["details"])
+
+    def test_unrealistic_leistung_is_rejected(self):
+        payload = {**self.base_payload, "leistung": 5000}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("leistung", response.data["details"])
+
+    def test_zero_tueren_is_rejected(self):
+        payload = {**self.base_payload, "tueren": 0}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("tueren", response.data["details"])
+
+    def test_too_many_tueren_is_rejected(self):
+        payload = {**self.base_payload, "tueren": 20}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("tueren", response.data["details"])
+
+    def test_valid_values_are_accepted(self):
+        payload = {
+            **self.base_payload,
+            "year": 2024,
+            "mileage": 0,
+            "price": "0.01",
+            "leistung": 150,
+            "tueren": 5,
+        }
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_leistung_and_tueren_may_be_omitted(self):
+        # Beide Felder sind optional (null=True, blank=True) - ohne Angabe
+        # muss das Anlegen trotzdem klappen (Validatoren duerfen nicht auf
+        # None angewendet werden).
+        response = self.client.post(self.url, self.base_payload)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        created = Vehicle.objects.get(model="Astra")
+        self.assertIsNone(created.leistung)
+        self.assertIsNone(created.tueren)

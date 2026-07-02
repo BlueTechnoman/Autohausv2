@@ -26,6 +26,17 @@ class Sale(models.Model):
         auto_now_add=True
     )
 
+    # Gruppiert mehrere Sale-Zeilen, die aus demselben Checkout-Vorgang
+    # stammen (ein Warenkorb kann mehrere Fahrzeuge enthalten -> mehrere
+    # Sale-Zeilen mit derselben order_number). Leer bei manuell im Admin/
+    # per API einzeln angelegten Sales.
+    order_number = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        db_index=True,
+    )
+
     STATUS = [
         ("offer", "Angebot"),
         ("sold", "Verkauft"),
