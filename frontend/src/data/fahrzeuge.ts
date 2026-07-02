@@ -61,7 +61,31 @@ export interface Fahrzeug {
 
 export const MARKEN = ['Alle Marken', 'Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen']
 
-export const KRAFTSTOFFE = ['Alle', 'Benzin', 'Diesel', 'Elektro', 'Hybrid']
+/**
+ * Kraftstoff-Filteroptionen.
+ *
+ * WICHTIG: "value" muss exakt den Backend-Choices aus vehicles/models.py
+ * (KRAFTSTOFF_CHOICES) entsprechen, da f.kraftstoff genau diese rohen
+ * Werte enthält (z.B. "benzin", nicht "Benzin"). Nur "label" ist die
+ * deutsche Anzeige im Dropdown.
+ */
+export const KRAFTSTOFF_OPTIONS: { value: string; label: string }[] = [
+  { value: '',            label: 'Alle Kraftstoffe' },
+  { value: 'benzin',      label: 'Benzin' },
+  { value: 'diesel',      label: 'Diesel' },
+  { value: 'elektro',     label: 'Elektro' },
+  { value: 'hybrid',      label: 'Hybrid' },
+  { value: 'plug_in',     label: 'Plug-in-Hybrid' },
+  { value: 'lpg',         label: 'Autogas (LPG)' },
+  { value: 'erdgas',      label: 'Erdgas (CNG)' },
+  { value: 'wasserstoff', label: 'Wasserstoff' },
+  { value: 'sonstige',    label: 'Sonstige' },
+]
+
+/** Gibt das deutsche Label für einen rohen Kraftstoff-Wert zurück */
+export function formatKraftstoff(value: string): string {
+  return KRAFTSTOFF_OPTIONS.find(o => o.value === value)?.label ?? value
+}
 
 export const MAX_PREISE: { label: string; value: number }[] = [
   { label: 'Alle Preise',   value: 100000 },

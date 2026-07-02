@@ -22,14 +22,13 @@ import { ref, computed, onMounted } from 'vue'
 import FahrzeugKarte from './FahrzeugKarte.vue'
 import FilterBar     from './FilterBar.vue'
 import { useFahrzeuge } from '../composables/useFahrzeuge'
-import { MARKEN, KRAFTSTOFFE, MAX_PREISE } from '../data/fahrzeuge'
 
 // ── Composable – Fahrzeuge aus API laden ──────────────────────────────
-const { fahrzeuge, loading, error, laden } = useFahrzeuge()
+const { fahrzeuge, loading, loadingMore, error, gesamtAnzahl, hasMore, laden, mehrLaden } = useFahrzeuge()
 
 // ── Filter-State ──────────────────────────────────────────────────────
 const markeFilter      = ref('Alle Marken')
-const kraftstoffFilter = ref('Alle')
+const kraftstoffFilter = ref('')
 const maxPreis         = ref(100000)
 
 // ── Computed: gefilterte Fahrzeuge ────────────────────────────────────
@@ -37,7 +36,7 @@ const maxPreis         = ref(100000)
 const filteredFahrzeuge = computed(() =>
   fahrzeuge.value.filter((f) => {
     if (markeFilter.value !== 'Alle Marken' && f.marke !== markeFilter.value) return false
-    if (kraftstoffFilter.value !== 'Alle' && f.kraftstoff !== kraftstoffFilter.value) return false
+    if (kraftstoffFilter.value !== '' && f.kraftstoff !== kraftstoffFilter.value) return false
     if (f.preis > maxPreis.value) return false
     return true
   })
@@ -45,13 +44,13 @@ const filteredFahrzeuge = computed(() =>
 
 const hasActiveFilters = computed(() =>
   markeFilter.value !== 'Alle Marken' ||
-  kraftstoffFilter.value !== 'Alle'   ||
+  kraftstoffFilter.value !== ''       ||
   maxPreis.value !== 100000
 )
 
 function resetFilters() {
   markeFilter.value      = 'Alle Marken'
-  kraftstoffFilter.value = 'Alle'
+  kraftstoffFilter.value = ''
   maxPreis.value         = 100000
 }
 
@@ -74,7 +73,7 @@ onMounted(() => {
       <div class="mb-8">
         <h2 class="text-[#1a2e5a] text-3xl font-bold mb-1">Unsere Fahrzeuge</h2>
         <p v-if="!loading && !error" class="text-[#8e9aaa] text-sm">
-          {{ filteredFahrzeuge.length }} von {{ fahrzeuge.length }} Fahrzeugen
+          {{ filteredFahrzeuge.length }} von {{ gesamtAnzahl }} Fahrzeugen geladen
         </p>
       </div>
 
@@ -140,6 +139,18 @@ onMounted(() => {
           :key="fahrzeug.id"
           :fahrzeug="fahrzeug"
         />
+      </div>
+
+      <!-- ── "Mehr laden"-Button (Pagination) ── -->
+      <!-- Nur sichtbar solange die API weitere Seiten hat -->
+      <div v-if="!loading && !error && hasMore" class="flex justify-center mt-10">
+        <button
+          @click="mehrLaden()"
+          :disabled="loadingMore"
+          class="bg-white border-2 border-[#1a2e5a] text-[#1a2e5a] font-bold px-8 py-3 rounded hover:bg-[#1a2e5a] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ loadingMore ? 'Lädt…' : 'Weitere Fahrzeuge laden' }}
+        </button>
       </div>
 
     </div>

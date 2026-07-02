@@ -7,6 +7,7 @@ from django.db.models import Q
 
 from .models import Vehicle, VehicleImage
 from .serializers import VehicleSerializer, VehicleImageSerializer
+from .pagination import VehiclePagination
 
 
 class IsAuthenticatedOrReadOnly(BasePermission):
@@ -21,9 +22,13 @@ class VehicleViewSet(ModelViewSet):
     serializer_class = VehicleSerializer
     queryset = Vehicle.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = VehiclePagination
 
     def get_queryset(self):
-        queryset = Vehicle.objects.all()
+        # Feste Sortierung (neueste zuerst) - ohne order_by() waere die
+        # Reihenfolge zwischen Seiten nicht garantiert stabil (SQLite kann
+        # sonst je nach Anfrage unterschiedlich sortieren).
+        queryset = Vehicle.objects.all().order_by("-id")
 
         brand = self.request.query_params.get("brand")
         model = self.request.query_params.get("model")

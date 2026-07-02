@@ -32,12 +32,12 @@ import NavBar    from '../components/NavBar.vue'
 import AppFooter from '../components/AppFooter.vue'
 import { useAuth }        from '../composables/useAuth'
 import { useFahrzeuge }   from '../composables/useFahrzeuge'
-import { formatKm, formatPreis, formatStatus, statusBadgeClass } from '../data/fahrzeuge'
+import { formatKm, formatPreis, formatStatus, statusBadgeClass, formatKraftstoff, KRAFTSTOFF_OPTIONS } from '../data/fahrzeuge'
 import type { Fahrzeug } from '../data/fahrzeuge'
 
 const router = useRouter()
-const { user, logout }                = useAuth()
-const { fahrzeuge, loading, laden }   = useFahrzeuge()
+const { user, logout }                  = useAuth()
+const { fahrzeuge, loading, ladenAlle }  = useFahrzeuge()
 
 const scrolled = ref(false)
 const onScroll = () => { scrolled.value = window.scrollY > 24 }
@@ -90,12 +90,14 @@ function preisPfad(punkte: Fahrzeug['preisverlauf'], w = 300, h = 80): string {
 
 // ── Filter ────────────────────────────────────────────────────────────
 const filterStatus = ref<'' | 'available' | 'reserved' | 'sold'>('')
+const filterKraftstoff = ref('')
 const filterNurFavoriten = ref(false)
 const suchtext = ref('')
 
 const gefilterteFahrzeuge = computed(() => {
   return fahrzeuge.value.filter(f => {
     if (filterStatus.value && f.status !== filterStatus.value) return false
+    if (filterKraftstoff.value && f.kraftstoff !== filterKraftstoff.value) return false
     if (filterNurFavoriten.value && !favoriteIds.value.includes(f.id)) return false
     if (suchtext.value) {
       const q = suchtext.value.toLowerCase()
@@ -121,7 +123,9 @@ function handleLogout() {
 
 // ── Datenladen ────────────────────────────────────────────────────────
 onMounted(() => {
-  laden()  // Alle Fahrzeuge mit Preisverlauf laden
+  // ladenAlle() statt laden(): das Dashboard braucht die komplette Liste
+  // (Statistik-Kacheln, Filter) - nicht nur die erste Seite von 12.
+  ladenAlle()
 })
 </script>
 
@@ -200,6 +204,14 @@ onMounted(() => {
           <option value="sold">Verkauft</option>
         </select>
 
+        <!-- Kraftstoff-Filter -->
+        <select
+          v-model="filterKraftstoff"
+          class="px-3 py-2 border border-[#1a2e5a]/15 rounded-lg text-sm text-[#1a2e5a] focus:outline-none bg-white"
+        >
+          <option v-for="k in KRAFTSTOFF_OPTIONS" :key="k.value" :value="k.value">{{ k.label }}</option>
+        </select>
+
         <!-- Nur Favoriten -->
         <button
           @click="filterNurFavoriten = !filterNurFavoriten"
@@ -248,7 +260,7 @@ onMounted(() => {
                 </span>
               </div>
               <p class="text-[#8e9aaa] text-xs mt-0.5">
-                {{ f.baujahr }} · {{ formatKm(f.km) }} · {{ f.kraftstoff || '–' }}
+                {{ f.baujahr }} · {{ formatKm(f.km) }} · {{ f.kraftstoff ? formatKraftstoff(f.kraftstoff) : '–' }}
               </p>
             </div>
 

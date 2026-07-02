@@ -21,7 +21,7 @@
  */
 
 import { ref } from 'vue'
-import { apiFetch, getImageUrl, type ApiVehicle } from '../services/api'
+import { apiFetch, getImageUrl, type ApiVehicle, type PaginatedResponse } from '../services/api'
 import type { Fahrzeug } from '../data/fahrzeuge'
 
 // Fallback-Bild wenn kein Foto hochgeladen
@@ -70,37 +70,103 @@ export function mapApiToFahrzeug(raw: ApiVehicle): Fahrzeug {
 
 export function useFahrzeuge() {
   /** Geladene Fahrzeuge (reaktiv – Vue re-rendert wenn sich dies ändert) */
-  const fahrzeuge = ref<Fahrzeug[]>([])
-  const loading   = ref(false)
-  const error     = ref<string | null>(null)
+  const fahrzeuge   = ref<Fahrzeug[]>([])
+  const loading     = ref(false)
+  const loadingMore = ref(false)
+  const error       = ref<string | null>(null)
+
+  /** Gesamtzahl der Fahrzeuge auf dem Server (über alle Seiten hinweg) */
+  const gesamtAnzahl = ref(0)
+  /** Gibt es noch weitere Seiten zum Nachladen? */
+  const hasMore = ref(false)
+
+  // Aktuelle Seite + zuletzt genutzte Filter, damit "Mehr laden" dieselben
+  // Filterparameter mit der naechsten Seite weiterverwendet.
+  let currentPage = 1
+  let currentParams: Record<string, string | number> = {}
+
+  function buildEndpoint(params: Record<string, string | number>, page: number): string {
+    // Query-String aufbauen: { brand: 'BMW', year: 2021 } → ?brand=BMW&year=2021
+    const query = new URLSearchParams()
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== '' && val !== undefined) query.append(key, String(val))
+    })
+    if (page > 1) query.append('page', String(page))
+
+    return `/api/vehicles/${query.toString() ? '?' + query.toString() : ''}`
+  }
 
   /**
-   * laden() – Lädt alle Fahrzeuge von der API
+   * laden() – Lädt die erste Seite der Fahrzeuge von der API
    * Optional können API-Filterparameter übergeben werden:
    *   laden({ brand: 'BMW', status: 'available' })
    */
   async function laden(params: Record<string, string | number> = {}): Promise<void> {
     loading.value = true
     error.value   = null
+    currentPage   = 1
+    currentParams = params
 
     try {
-      // Query-String aufbauen: { brand: 'BMW', year: 2021 } → ?brand=BMW&year=2021
-      const query = new URLSearchParams()
-      Object.entries(params).forEach(([key, val]) => {
-        if (val !== '' && val !== undefined) query.append(key, String(val))
-      })
-
-      const endpoint = `/api/vehicles/${query.toString() ? '?' + query.toString() : ''}`
-      const raw = await apiFetch<ApiVehicle[]>(endpoint)
+      // Die Liste ist paginiert (Backend-Update): die API liefert
+      // { count, next, previous, results: [...] } statt einer nackten
+      // Liste. Die eigentlichen Fahrzeuge stecken in "results".
+      const raw = await apiFetch<PaginatedResponse<ApiVehicle>>(buildEndpoint(params, 1))
 
       // API-Daten → Vue-Frontend-Format mappen
-      fahrzeuge.value = raw.map(mapApiToFahrzeug)
+      fahrzeuge.value  = raw.results.map(mapApiToFahrzeug)
+      gesamtAnzahl.value = raw.count
+      hasMore.value      = raw.next !== null
 
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Fehler beim Laden der Fahrzeuge.'
       console.error('[useFahrzeuge] Ladefehler:', err)
     } finally {
       loading.value = false
+    }
+  }
+
+  /**
+   * mehrLaden() – Lädt die nächste Seite nach und hängt sie an die
+   * bereits geladenen Fahrzeuge an ("Mehr laden"-Button).
+   * Nutzt dieselben Filterparameter wie der letzte laden()-Aufruf.
+   */
+  async function mehrLaden(): Promise<void> {
+    if (!hasMore.value || loadingMore.value) return
+
+    loadingMore.value = true
+    error.value = null
+
+    try {
+      const nextPage = currentPage + 1
+      const raw = await apiFetch<PaginatedResponse<ApiVehicle>>(buildEndpoint(currentParams, nextPage))
+
+      fahrzeuge.value = [...fahrzeuge.value, ...raw.results.map(mapApiToFahrzeug)]
+      gesamtAnzahl.value = raw.count
+      hasMore.value      = raw.next !== null
+      currentPage        = nextPage
+
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Fehler beim Nachladen der Fahrzeuge.'
+      console.error('[useFahrzeuge] Nachladefehler:', err)
+    } finally {
+      loadingMore.value = false
+    }
+  }
+
+  /**
+   * ladenAlle() – Lädt WIRKLICH alle Fahrzeuge, seitenweise im Hintergrund
+   * nachgeladen bis keine weitere Seite mehr da ist.
+   *
+   * Für Ansichten wie das Dashboard gedacht, die (anders als die öffentliche
+   * Startseite mit "Mehr laden"-Button) die komplette Liste zum Filtern
+   * brauchen, z.B. weil Statistik-Kacheln (gesamt/verfügbar/reserviert)
+   * auf der vollständigen Liste basieren.
+   */
+  async function ladenAlle(params: Record<string, string | number> = {}): Promise<void> {
+    await laden(params)
+    while (hasMore.value) {
+      await mehrLaden()
     }
   }
 
@@ -118,5 +184,16 @@ export function useFahrzeuge() {
     }
   }
 
-  return { fahrzeuge, loading, error, laden, ladenEinzel }
+  return {
+    fahrzeuge,
+    loading,
+    loadingMore,
+    error,
+    gesamtAnzahl,
+    hasMore,
+    laden,
+    ladenAlle,
+    mehrLaden,
+    ladenEinzel,
+  }
 }
