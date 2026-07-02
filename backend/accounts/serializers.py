@@ -16,11 +16,18 @@ class RegisterSerializer(serializers.ModelSerializer):
             "password",
             "role",
         ]
+        # "role" darf beim Self-Service-Register nur gelesen, nicht gesetzt
+        # werden - sonst koennte sich jeder z.B. role="admin" selbst geben.
+        read_only_fields = ["role"]
 
     def create(self, validated_data):
+        # Sicherheitsnetz: falls "role" trotz read_only_fields irgendwie
+        # im validated_data landet, hier zusaetzlich hart ueberschreiben.
+        validated_data.pop("role", None)
+
         return User.objects.create_user(
             username=validated_data["username"],
             email=validated_data.get("email"),
             password=validated_data["password"],
-            role=validated_data["role"],
+            role="customer",
         )
