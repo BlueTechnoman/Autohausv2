@@ -179,6 +179,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Barlow', sans-serif;
+    overflow-x: clip; /* Verhindert horizontales Überlaufen ohne sticky-Elemente zu brechen */
   }
 
   html {
