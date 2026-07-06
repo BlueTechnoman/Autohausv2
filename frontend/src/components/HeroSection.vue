@@ -33,7 +33,7 @@ const STATS: [string, string][] = [
       <img
         src="https://images.unsplash.com/photo-1692406069831-0bb7ea297645?w=1920&h=1080&fit=crop&auto=format"
         alt="AutoHaus Bayreuth Showroom"
-        class="w-full h-full object-cover opacity-40"
+        class="w-full h-full object-cover opacity-60"
       />
       <!--
         Gradient-Overlay:
@@ -41,7 +41,7 @@ const STATS: [string, string][] = [
                  und Text über fast die gesamte Breite geht
         Desktop: from-[#1a2e5a]/90 via-55% to-transparent → Bild rechts sichtbar
       -->
-      <div class="absolute inset-0 bg-[#1a2e5a]/75 sm:bg-gradient-to-r sm:from-[#1a2e5a]/90 sm:via-[#1a2e5a]/55 sm:to-transparent" />
+      <div class="absolute inset-0 bg-[#1a2e5a]/55 sm:bg-[#1a2e5a]/55" />
     </div>
 
     <!-- Seiteninhalt (über Overlay) -->
