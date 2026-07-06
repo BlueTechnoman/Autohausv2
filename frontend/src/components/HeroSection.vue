@@ -27,7 +27,7 @@ const STATS: [string, string][] = [
 </script>
 
 <template>
-  <section id="hero" class="relative min-h-[90vh] flex items-center overflow-hidden pt-16">
+  <section id="hero" class="relative min-h-[90vh] flex items-center overflow-hidden pt-16 w-full">
 
     <!-- Hintergrundbild mit Overlay -->
     <div class="absolute inset-0 bg-[#1a2e5a]">

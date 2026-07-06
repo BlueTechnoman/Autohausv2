@@ -243,39 +243,40 @@ onMounted(() => {
           class="bg-white rounded-xl border border-[#1a2e5a]/8 shadow-sm overflow-hidden"
         >
           <!-- Zeilen-Header (immer sichtbar) -->
-          <div class="p-4 flex items-center gap-4">
+          <div class="p-3 sm:p-4 flex items-center gap-2 sm:gap-4">
 
             <!-- Fahrzeugbild (klein) -->
-            <div class="w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-[#e2e8f0]">
+            <div class="w-14 h-10 sm:w-20 sm:h-14 shrink-0 rounded-lg overflow-hidden bg-[#e2e8f0]">
               <img :src="f.bild" :alt="f.modell" class="w-full h-full object-cover" />
             </div>
 
             <!-- Basis-Info -->
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-[#1a2e5a] font-bold text-sm">{{ f.marke }} {{ f.modell }}</span>
-                <!-- Status-Badge -->
-                <span :class="['text-xs font-bold px-2 py-0.5 rounded-full', statusBadgeClass(f.status)]">
+              <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+                <span class="text-[#1a2e5a] font-bold text-sm truncate max-w-[120px] sm:max-w-none">{{ f.marke }} {{ f.modell }}</span>
+                <span :class="['text-xs font-bold px-2 py-0.5 rounded-full shrink-0', statusBadgeClass(f.status)]">
                   {{ formatStatus(f.status) }}
                 </span>
               </div>
-              <p class="text-[#8e9aaa] text-xs mt-0.5">
+              <!-- Preis auf Mobile direkt hier anzeigen -->
+              <p class="text-[#1a2e5a] font-bold text-sm sm:hidden">{{ formatPreis(f.preis) }}</p>
+              <p class="text-[#8e9aaa] text-xs truncate">
                 {{ f.baujahr }} · {{ formatKm(f.km) }} · {{ f.kraftstoff ? formatKraftstoff(f.kraftstoff) : '–' }}
               </p>
             </div>
 
-            <!-- Preis -->
-            <div class="text-right shrink-0">
+            <!-- Preis (nur Desktop) -->
+            <div class="text-right shrink-0 hidden sm:block">
               <div class="text-[#1a2e5a] font-bold text-base">{{ formatPreis(f.preis) }}</div>
               <div class="text-[#8e9aaa] text-xs">{{ f.leistung ? f.leistung + ' PS' : '' }}</div>
             </div>
 
             <!-- Aktions-Buttons -->
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-1 sm:gap-2 shrink-0">
               <!-- Favorit -->
               <button
                 @click="toggleFavorite(f.id)"
-                :class="['w-9 h-9 rounded-full border flex items-center justify-center transition-colors',
+                :class="['w-8 h-8 sm:w-9 sm:h-9 rounded-full border flex items-center justify-center transition-colors',
                   favoriteIds.includes(f.id) ? 'bg-[#e85c1a]/10 border-[#e85c1a]/30' : 'border-[#1a2e5a]/15 hover:bg-[#1a2e5a]/5']"
                 :title="favoriteIds.includes(f.id) ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'"
               >
@@ -286,7 +287,7 @@ onMounted(() => {
               <!-- Details aufklappen -->
               <button
                 @click="toggleExpand(f.id)"
-                class="w-9 h-9 rounded-full border border-[#1a2e5a]/15 hover:bg-[#1a2e5a]/5 flex items-center justify-center transition-colors"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#1a2e5a]/15 hover:bg-[#1a2e5a]/5 flex items-center justify-center transition-colors"
                 :title="expandedId === f.id ? 'Einklappen' : 'Details anzeigen'"
               >
                 <ChevronUp v-if="expandedId === f.id" :size="16" class="text-[#1a2e5a]" />
@@ -296,7 +297,7 @@ onMounted(() => {
               <!-- Zur Detailseite -->
               <button
                 @click="$router.push(`/fahrzeug/${f.id}`)"
-                class="w-9 h-9 rounded-full bg-[#1a2e5a] hover:bg-[#1a2e5a]/85 flex items-center justify-center transition-colors"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1a2e5a] hover:bg-[#1a2e5a]/85 flex items-center justify-center transition-colors"
                 title="Öffentliche Detailseite"
               >
                 <Eye :size="14" class="text-white" />
