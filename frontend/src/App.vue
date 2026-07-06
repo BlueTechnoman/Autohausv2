@@ -6,7 +6,6 @@ import CookieBanner from './components/CookieBanner.vue'
 
 const { text, visible } = useNotification()
 
-// Konami Code Sonic Easter Egg 
 const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
                 'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
 const progress    = ref(0)
@@ -17,14 +16,12 @@ const sonicRight  = ref(-80)
 let animFrame: number
 let startTime: number
 
-// Geschwindigkeit pro Phase in px/sekunde
 const SPEED = { start: 60, slow: 120, fast: 600 }
 
 function animate(ts: number) {
   if (!startTime) startTime = ts
   const elapsed = (ts - startTime) / 1000
 
-  // start: 0 – 2500ms | slow: 2500 – 7000ms | fast: 7000ms+
   if (elapsed < 2.5)      sonicPhase.value = 'start'
   else if (elapsed < 5.0) sonicPhase.value = 'slow'
   else                    sonicPhase.value = 'fast'
@@ -89,7 +86,6 @@ onUnmounted(() => {
     <RouterView />
     <CookieBanner />
 
-    <!-- Sonic Easter Egg: kommt von rechts, läuft nach links -->
     <div
       v-if="sonicActive"
       class="fixed bottom-6 z-[9999] pointer-events-none"
@@ -110,5 +106,5 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Position wird per JavaScript gesteuert – kein CSS-Animation */
+
 </style>

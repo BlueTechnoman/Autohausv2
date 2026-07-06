@@ -34,7 +34,7 @@ import { RouterLink } from 'vue-router'
 import { useCart }        from '../composables/useCart'
 import { useNotification }from '../composables/useNotification'
 import type { Fahrzeug }  from '../data/fahrzeuge'
-import { formatKm, formatPreis } from '../data/fahrzeuge'
+import { formatKm, formatPreis, formatKraftstoff } from '../data/fahrzeuge'
 
 // ── Props (read-only von außen) ───────────────────────────────────────
 // defineProps: Vue-Mechanismus für Eltern → Kind Datenweitergabe
@@ -126,7 +126,7 @@ function handleCart() {
         <span class="w-px h-3 bg-[#1a2e5a]/12" />
         <span class="flex items-center gap-1.5">
           <Fuel :size="12" class="shrink-0" />
-          {{ fahrzeug.kraftstoff || '–' }}
+          {{ formatKraftstoff(fahrzeug.kraftstoff) || '–' }}
         </span>
       </div>
 

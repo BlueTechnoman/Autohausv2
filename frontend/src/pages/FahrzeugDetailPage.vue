@@ -24,7 +24,7 @@ import AppFooter from '../components/AppFooter.vue'
 import { useFahrzeuge }    from '../composables/useFahrzeuge'
 import { useCart }         from '../composables/useCart'
 import { useNotification } from '../composables/useNotification'
-import { formatKm, formatPreis } from '../data/fahrzeuge'
+import { formatKm, formatPreis , formatKraftstoff, formatGetriebe } from '../data/fahrzeuge'
 import type { Fahrzeug } from '../data/fahrzeuge'
 
 const route  = useRoute()
