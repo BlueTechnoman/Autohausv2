@@ -1,4 +1,28 @@
+#Hier wird die Datenbankstruktur der Anwendung für die Datenbank deffiniert (RH, NW)
+
+
+from datetime import date
+from decimal import Decimal
+
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+
+
+def validate_year(value):
+    """
+    Baujahr muss plausibel sein: nicht vor 1900 und nicht mehr als ein
+    Jahr in der Zukunft (neue Modelljahre werden teils vorab gelistet).
+
+    Als eigene Funktion (statt fixer MinValueValidator/MaxValueValidator-
+    Grenzen), weil die Obergrenze vom aktuellen Jahr abhaengt und sich
+    damit automatisch mitzieht statt in einer Migration einzufrieren.
+    """
+    aktuelles_jahr = date.today().year
+    if value < 1900 or value > aktuelles_jahr + 1:
+        raise ValidationError(
+            f"Baujahr muss zwischen 1900 und {aktuelles_jahr + 1} liegen."
+        )
 
 
 class Vehicle(models.Model):
@@ -6,9 +30,25 @@ class Vehicle(models.Model):
     # ── Basisdaten ────────────────────────────────────────────────────
     brand   = models.CharField(max_length=50, verbose_name="Marke")
     model   = models.CharField(max_length=100, verbose_name="Modell")
-    year    = models.IntegerField(verbose_name="Baujahr")
-    mileage = models.IntegerField(verbose_name="Kilometerstand")
-    price   = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Preis")
+    year    = models.IntegerField(
+        verbose_name="Baujahr",
+        validators=[validate_year],
+    )
+    mileage = models.IntegerField(
+        verbose_name="Kilometerstand",
+        validators=[
+            MinValueValidator(0, message="Kilometerstand darf nicht negativ sein."),
+            MaxValueValidator(1_000_000, message="Kilometerstand wirkt unrealistisch (max. 1.000.000 km)."),
+        ],
+    )
+    price   = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Preis",
+        validators=[
+            MinValueValidator(Decimal("0.01"), message="Preis muss größer als 0 sein."),
+        ],
+    )
 
     STATUS = [
         ("available", "Verfügbar"),
@@ -56,7 +96,11 @@ class Vehicle(models.Model):
     leistung = models.IntegerField(
         null=True,
         blank=True,
-        verbose_name="Leistung (PS)"
+        verbose_name="Leistung (PS)",
+        validators=[
+            MinValueValidator(1, message="Leistung muss größer als 0 sein."),
+            MaxValueValidator(2000, message="Leistung wirkt unrealistisch (max. 2000 PS)."),
+        ],
     )
 
     farbe = models.CharField(
@@ -85,7 +129,11 @@ class Vehicle(models.Model):
     tueren = models.IntegerField(
         null=True,
         blank=True,
-        verbose_name="Türanzahl"
+        verbose_name="Türanzahl",
+        validators=[
+            MinValueValidator(1, message="Türanzahl muss mindestens 1 sein."),
+            MaxValueValidator(8, message="Türanzahl wirkt unrealistisch (max. 8)."),
+        ],
     )
 
     # ── Beschreibung & Ausstattung ────────────────────────────────────
@@ -138,7 +186,10 @@ class PriceHistory(models.Model):
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        verbose_name="Preis"
+        verbose_name="Preis",
+        validators=[
+            MinValueValidator(Decimal("0.01"), message="Preis muss größer als 0 sein."),
+        ],
     )
 
     recorded_at = models.DateField(

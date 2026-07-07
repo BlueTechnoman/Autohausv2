@@ -61,7 +61,46 @@ export interface Fahrzeug {
 
 export const MARKEN = ['Alle Marken', 'Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen']
 
-export const KRAFTSTOFFE = ['Alle', 'Benzin', 'Diesel', 'Elektro', 'Hybrid']
+/**
+ * Kraftstoff-Filteroptionen.
+ *
+ * WICHTIG: "value" muss exakt den Backend-Choices aus vehicles/models.py
+ * (KRAFTSTOFF_CHOICES) entsprechen, da f.kraftstoff genau diese rohen
+ * Werte enthält (z.B. "benzin", nicht "Benzin"). Nur "label" ist die
+ * deutsche Anzeige im Dropdown.
+ */
+export const KRAFTSTOFF_OPTIONS: { value: string; label: string }[] = [
+  { value: '',            label: 'Alle Kraftstoffe' },
+  { value: 'benzin',      label: 'Benzin' },
+  { value: 'diesel',      label: 'Diesel' },
+  { value: 'elektro',     label: 'Elektro' },
+  { value: 'hybrid',      label: 'Hybrid' },
+  { value: 'plug_in',     label: 'Plug-in-Hybrid' },
+  { value: 'lpg',         label: 'Autogas (LPG)' },
+  { value: 'erdgas',      label: 'Erdgas (CNG)' },
+  { value: 'wasserstoff', label: 'Wasserstoff' },
+  { value: 'sonstige',    label: 'Sonstige' },
+]
+
+/** Gibt das deutsche Label für einen rohen Kraftstoff-Wert zurück */
+export function formatKraftstoff(value: string): string {
+  return KRAFTSTOFF_OPTIONS.find(o => o.value === value)?.label ?? value
+}
+
+/** Getriebe-Optionen – Werte entsprechen exakt den Backend-GETRIEBE_CHOICES */
+export const GETRIEBE_OPTIONS: { value: string; label: string }[] = [
+  { value: '',              label: 'Alle Getriebe' },
+  { value: 'manuell',       label: 'Schaltgetriebe' },
+  { value: 'automatik',     label: 'Automatik' },
+  { value: 'halbautomatik', label: 'Halbautomatik' },
+]
+
+/** Gibt das deutsche Label für einen rohen Getriebe-Wert zurück */
+export function formatGetriebe(value: string): string {
+  return GETRIEBE_OPTIONS.find(o => o.value === value)?.label ?? value
+}
+
+
 
 export const MAX_PREISE: { label: string; value: number }[] = [
   { label: 'Alle Preise',   value: 100000 },
@@ -78,9 +117,9 @@ export function formatKm(km: number): string {
   return km.toLocaleString('de-DE') + ' km'
 }
 
-/** Formatiert Preis: 32900 → "32.900 €" */
+/** Formatiert Preis: 32900 → "32.900,00 €" (immer 2 Dezimalstellen) */
 export function formatPreis(preis: number): string {
-  return preis.toLocaleString('de-DE') + ' €'
+  return preis.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
 }
 
 /** Gibt ein lesbares Status-Label zurück */

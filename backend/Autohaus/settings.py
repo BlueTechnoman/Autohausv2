@@ -1,3 +1,7 @@
+#settings.py ist die zentrale Konfigurationsdatei eines Django-Projekts. Dort legst du fest, wie deine gesamte Anwendung funktioniert.
+#(RH, NW)
+
+
 """
 Django settings for Autohaus project.
 
@@ -10,22 +14,61 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# ── Hilfsfunktionen fuer Umgebungsvariablen ────────────────────────────
+# Kein zusaetzliches Package (z.B. django-environ) noetig - nur os.environ.
+# Ohne gesetzte Variablen verhaelt sich alles GENAU wie vorher (DEBUG=True,
+# ALLOWED_HOSTS=["*"], CORS offen) - das bestehende docker-compose-Setup
+# funktioniert also unveraendert weiter. Fuer einen Produktivbetrieb
+# koennen die Variablen aus .env.example gesetzt werden.
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
+
+def _env_list(name: str, default: list[str]) -> list[str]:
+    value = os.environ.get(name)
+    if not value:
+        return default
+    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-69#b*x%5xiw6_a26lc#tl&aah#u@&w__#r(msw_8r*_61_s^aq'
+# In Produktion per Umgebungsvariable DJANGO_SECRET_KEY setzen (siehe
+# .env.example). Der Insecure-Key hier ist NUR fuer lokale Entwicklung.
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-69#b*x%5xiw6_a26lc#tl&aah#u@&w__#r(msw_8r*_61_s^aq",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _env_bool("DJANGO_DEBUG", True)
 
-ALLOWED_HOSTS = ["*"]
+# In Produktion (DEBUG=False) MUSS DJANGO_ALLOWED_HOSTS gesetzt werden,
+# z.B. "meineseite.de,www.meineseite.de" - deshalb dort kein "*"-Default.
+ALLOWED_HOSTS = _env_list("DJANGO_ALLOWED_HOSTS", ["*"] if DEBUG else [])
+
+# Verhindert das versehentliche Deployen mit dem oeffentlich bekannten
+# Insecure-Dev-Key, sobald DEBUG=False (also "Produktivbetrieb") aktiv ist.
+if not DEBUG and SECRET_KEY.startswith("django-insecure-"):
+    raise ImproperlyConfigured(
+        "DJANGO_SECRET_KEY muss per Umgebungsvariable gesetzt werden, "
+        "sobald DJANGO_DEBUG=False ist. Der Insecure-Default-Key darf "
+        "nicht in Produktion verwendet werden."
+    )
 
 
 # Application definition
@@ -61,7 +104,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
 ]
-CORS_ALLOW_ALL_ORIGINS = True
+
+# Ohne DJANGO_CORS_ALLOWED_ORIGINS: im DEBUG-Modus alles erlauben (damit
+# der Vite-Dev-Server auf Port 5173 ohne Extra-Konfiguration funktioniert -
+# entspricht dem bisherigen Verhalten). In Produktion (DEBUG=False) NICHT
+# automatisch alles erlauben, sondern explizite Origins verlangen.
+_cors_origins_env = os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS")
+if _cors_origins_env:
+    CORS_ALLOWED_ORIGINS = _env_list("DJANGO_CORS_ALLOWED_ORIGINS", [])
+    CORS_ALLOW_ALL_ORIGINS = False
+else:
+    CORS_ALLOW_ALL_ORIGINS = DEBUG
+
 ROOT_URLCONF = 'Autohaus.urls'
 
 TEMPLATES = [
@@ -143,6 +197,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "EXCEPTION_HANDLER": "Autohaus.exceptions.custom_exception_handler",
 }
 
 from datetime import timedelta
@@ -151,3 +206,16 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
+
+
+# ── Zusaetzliche Security-Header fuer den Produktivbetrieb ────────────
+# Greifen NUR wenn DEBUG=False, damit lokale Entwicklung (http://localhost)
+# nicht ploetzlich kaputtgeht (z.B. durch erzwungenes HTTPS).
+if not DEBUG:
+    SECURE_SSL_REDIRECT = _env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 Jahr
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True

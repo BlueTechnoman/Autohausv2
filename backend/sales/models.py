@@ -1,3 +1,5 @@
+#Hier wird die Datenbankstruktur der Anwendung für die Datenbank deffiniert (RH, NW)
+
 from django.db import models
 from customers.models import Customer
 from vehicles.models import Vehicle
@@ -22,6 +24,17 @@ class Sale(models.Model):
 
     date = models.DateTimeField(
         auto_now_add=True
+    )
+
+    # Gruppiert mehrere Sale-Zeilen, die aus demselben Checkout-Vorgang
+    # stammen (ein Warenkorb kann mehrere Fahrzeuge enthalten -> mehrere
+    # Sale-Zeilen mit derselben order_number). Leer bei manuell im Admin/
+    # per API einzeln angelegten Sales.
+    order_number = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        db_index=True,
     )
 
     STATUS = [

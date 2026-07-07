@@ -1,3 +1,6 @@
+#Hier wird festgelegt wer auf welche API zugreifen darf (RH, NW)
+
+
 from rest_framework import serializers
 from .models import Vehicle, VehicleImage, PriceHistory
 

@@ -22,6 +22,10 @@ function goHome() { router.push('/'); mobileMenuOpen.value = false }
 
 async function handleNav(target: string) {
   mobileMenuOpen.value = false
+  // 150ms warten bis Menü geschlossen ist – verhindert "touch-through":
+  // Ohne Delay registriert der Touch-Event nach dem Schließen des Menüs
+  // auf der dahinter liegenden Fahrzeug-Karte und navigiert dorthin.
+  await new Promise(r => setTimeout(r, 150))
   if (target.startsWith('/')) { router.push(target); return }
   if (route.path === '/') {
     document.getElementById(target)?.scrollIntoView({ behavior: 'smooth' })

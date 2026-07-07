@@ -98,6 +98,17 @@ export async function apiFetch<T>(
 
 // ── Typen für API-Antworten ──────────────────────────────────────────
 
+/**
+ * Envelope, den DRFs PageNumberPagination um paginierte Listen legt.
+ * Betrifft aktuell GET /api/vehicles/.
+ */
+export interface PaginatedResponse<T> {
+  count:    number
+  next:     string | null
+  previous: string | null
+  results:  T[]
+}
+
 /** Bild-Objekt wie es die API zurückgibt */
 export interface ApiVehicleImage {
   id:          number
@@ -149,4 +160,4 @@ export interface ApiUser {
 export interface ApiTokenResponse {
   access:  string
   refresh: string
-}
+} 

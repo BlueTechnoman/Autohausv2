@@ -1,7 +1,12 @@
+#Hier wird die Logik der Anwendung festgelegt. Eine View verarbeitet eine Anfrage, 
+#führt dann den benötigten Code aus und gibt eine Antwort (RH, NW)
+
 from django.contrib.auth import get_user_model
-from rest_framework import generics, permissions, serializers
+from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from .serializers import RegisterSerializer
 
 User = get_user_model()
 
@@ -9,28 +14,6 @@ User = get_user_model()
 # -------------------------
 # REGISTER
 # -------------------------
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = User
-        fields = [
-            "username",
-            "email",
-            "password",
-            "role",
-        ]
-
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data["username"],
-            email=validated_data.get("email"),
-            password=validated_data["password"],
-            role=validated_data["role"],
-        )
-        return user
-
-
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer

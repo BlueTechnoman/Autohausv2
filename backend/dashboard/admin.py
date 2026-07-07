@@ -1,0 +1,1 @@
+#Registriert Modelle im Django-Adminbereich und macht es verwendbar (RH, NW)

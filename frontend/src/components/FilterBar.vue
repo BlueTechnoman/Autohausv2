@@ -24,13 +24,12 @@
 -->
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next'
+import { KRAFTSTOFF_OPTIONS } from '../data/fahrzeuge'
 
 // ── Statische Filter-Optionen ─────────────────────────────────────────
 // Diese werden nicht aus der API geladen – sie definieren das UI-Verhalten.
 // Neue Marken werden hier und im Backend-Filterfeld gepflegt.
 const MARKEN = ['Alle Marken', 'Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen']
-
-const KRAFTSTOFFE = ['Alle', 'Benzin', 'Diesel', 'Elektro', 'Hybrid']
 
 const MAX_PREISE: { label: string; value: number }[] = [
   { label: 'Alle Preise',  value: 100000 },
@@ -90,7 +89,7 @@ const emit = defineEmits<{ reset: [] }>()
                    px-3 py-2 text-sm text-[#1a2e5a] font-semibold pr-7
                    focus:outline-none focus:ring-2 focus:ring-[#1a2e5a]/20 cursor-pointer"
           >
-            <option v-for="k in KRAFTSTOFFE" :key="k" :value="k">{{ k }}</option>
+            <option v-for="k in KRAFTSTOFF_OPTIONS" :key="k.value" :value="k.value">{{ k.label }}</option>
           </select>
           <ChevronDown :size="13" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#1a2e5a]/40 pointer-events-none" />
         </div>

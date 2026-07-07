@@ -1,3 +1,4 @@
+#Hier wird festgelegt welcher Code  zu welcher aufgerufenen URL gehört (RH, NW)
 from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,

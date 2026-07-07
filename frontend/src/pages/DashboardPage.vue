@@ -32,12 +32,12 @@ import NavBar    from '../components/NavBar.vue'
 import AppFooter from '../components/AppFooter.vue'
 import { useAuth }        from '../composables/useAuth'
 import { useFahrzeuge }   from '../composables/useFahrzeuge'
-import { formatKm, formatPreis, formatStatus, statusBadgeClass } from '../data/fahrzeuge'
+import { formatKm, formatPreis, formatStatus, statusBadgeClass, formatKraftstoff, KRAFTSTOFF_OPTIONS } from '../data/fahrzeuge'
 import type { Fahrzeug } from '../data/fahrzeuge'
 
 const router = useRouter()
-const { user, logout }                = useAuth()
-const { fahrzeuge, loading, laden }   = useFahrzeuge()
+const { user, logout }                  = useAuth()
+const { fahrzeuge, loading, ladenAlle }  = useFahrzeuge()
 
 const scrolled = ref(false)
 const onScroll = () => { scrolled.value = window.scrollY > 24 }
@@ -90,12 +90,14 @@ function preisPfad(punkte: Fahrzeug['preisverlauf'], w = 300, h = 80): string {
 
 // ── Filter ────────────────────────────────────────────────────────────
 const filterStatus = ref<'' | 'available' | 'reserved' | 'sold'>('')
+const filterKraftstoff = ref('')
 const filterNurFavoriten = ref(false)
 const suchtext = ref('')
 
 const gefilterteFahrzeuge = computed(() => {
   return fahrzeuge.value.filter(f => {
     if (filterStatus.value && f.status !== filterStatus.value) return false
+    if (filterKraftstoff.value && f.kraftstoff !== filterKraftstoff.value) return false
     if (filterNurFavoriten.value && !favoriteIds.value.includes(f.id)) return false
     if (suchtext.value) {
       const q = suchtext.value.toLowerCase()
@@ -121,7 +123,9 @@ function handleLogout() {
 
 // ── Datenladen ────────────────────────────────────────────────────────
 onMounted(() => {
-  laden()  // Alle Fahrzeuge mit Preisverlauf laden
+  // ladenAlle() statt laden(): das Dashboard braucht die komplette Liste
+  // (Statistik-Kacheln, Filter) - nicht nur die erste Seite von 12.
+  ladenAlle()
 })
 </script>
 
@@ -200,6 +204,14 @@ onMounted(() => {
           <option value="sold">Verkauft</option>
         </select>
 
+        <!-- Kraftstoff-Filter -->
+        <select
+          v-model="filterKraftstoff"
+          class="px-3 py-2 border border-[#1a2e5a]/15 rounded-lg text-sm text-[#1a2e5a] focus:outline-none bg-white"
+        >
+          <option v-for="k in KRAFTSTOFF_OPTIONS" :key="k.value" :value="k.value">{{ k.label }}</option>
+        </select>
+
         <!-- Nur Favoriten -->
         <button
           @click="filterNurFavoriten = !filterNurFavoriten"
@@ -231,39 +243,40 @@ onMounted(() => {
           class="bg-white rounded-xl border border-[#1a2e5a]/8 shadow-sm overflow-hidden"
         >
           <!-- Zeilen-Header (immer sichtbar) -->
-          <div class="p-4 flex items-center gap-4">
+          <div class="p-3 sm:p-4 flex items-center gap-2 sm:gap-4">
 
             <!-- Fahrzeugbild (klein) -->
-            <div class="w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-[#e2e8f0]">
+            <div class="w-14 h-10 sm:w-20 sm:h-14 shrink-0 rounded-lg overflow-hidden bg-[#e2e8f0]">
               <img :src="f.bild" :alt="f.modell" class="w-full h-full object-cover" />
             </div>
 
             <!-- Basis-Info -->
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-[#1a2e5a] font-bold text-sm">{{ f.marke }} {{ f.modell }}</span>
-                <!-- Status-Badge -->
-                <span :class="['text-xs font-bold px-2 py-0.5 rounded-full', statusBadgeClass(f.status)]">
+              <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+                <span class="text-[#1a2e5a] font-bold text-sm truncate max-w-[120px] sm:max-w-none">{{ f.marke }} {{ f.modell }}</span>
+                <span :class="['text-xs font-bold px-2 py-0.5 rounded-full shrink-0', statusBadgeClass(f.status)]">
                   {{ formatStatus(f.status) }}
                 </span>
               </div>
-              <p class="text-[#8e9aaa] text-xs mt-0.5">
-                {{ f.baujahr }} · {{ formatKm(f.km) }} · {{ f.kraftstoff || '–' }}
+              <!-- Preis auf Mobile direkt hier anzeigen -->
+              <p class="text-[#1a2e5a] font-bold text-sm sm:hidden">{{ formatPreis(f.preis) }}</p>
+              <p class="text-[#8e9aaa] text-xs truncate">
+                {{ f.baujahr }} · {{ formatKm(f.km) }} · {{ f.kraftstoff ? formatKraftstoff(f.kraftstoff) : '–' }}
               </p>
             </div>
 
-            <!-- Preis -->
-            <div class="text-right shrink-0">
+            <!-- Preis (nur Desktop) -->
+            <div class="text-right shrink-0 hidden sm:block">
               <div class="text-[#1a2e5a] font-bold text-base">{{ formatPreis(f.preis) }}</div>
               <div class="text-[#8e9aaa] text-xs">{{ f.leistung ? f.leistung + ' PS' : '' }}</div>
             </div>
 
             <!-- Aktions-Buttons -->
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-1 sm:gap-2 shrink-0">
               <!-- Favorit -->
               <button
                 @click="toggleFavorite(f.id)"
-                :class="['w-9 h-9 rounded-full border flex items-center justify-center transition-colors',
+                :class="['w-8 h-8 sm:w-9 sm:h-9 rounded-full border flex items-center justify-center transition-colors',
                   favoriteIds.includes(f.id) ? 'bg-[#e85c1a]/10 border-[#e85c1a]/30' : 'border-[#1a2e5a]/15 hover:bg-[#1a2e5a]/5']"
                 :title="favoriteIds.includes(f.id) ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'"
               >
@@ -274,7 +287,7 @@ onMounted(() => {
               <!-- Details aufklappen -->
               <button
                 @click="toggleExpand(f.id)"
-                class="w-9 h-9 rounded-full border border-[#1a2e5a]/15 hover:bg-[#1a2e5a]/5 flex items-center justify-center transition-colors"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#1a2e5a]/15 hover:bg-[#1a2e5a]/5 flex items-center justify-center transition-colors"
                 :title="expandedId === f.id ? 'Einklappen' : 'Details anzeigen'"
               >
                 <ChevronUp v-if="expandedId === f.id" :size="16" class="text-[#1a2e5a]" />
@@ -284,7 +297,7 @@ onMounted(() => {
               <!-- Zur Detailseite -->
               <button
                 @click="$router.push(`/fahrzeug/${f.id}`)"
-                class="w-9 h-9 rounded-full bg-[#1a2e5a] hover:bg-[#1a2e5a]/85 flex items-center justify-center transition-colors"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1a2e5a] hover:bg-[#1a2e5a]/85 flex items-center justify-center transition-colors"
                 title="Öffentliche Detailseite"
               >
                 <Eye :size="14" class="text-white" />
