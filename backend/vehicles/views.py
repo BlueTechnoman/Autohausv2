@@ -5,6 +5,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 from django.db.models import Q
 
+import requests
+from django.http import HttpResponse
 from .models import Vehicle, VehicleImage
 from .serializers import VehicleSerializer, VehicleImageSerializer
 from .pagination import VehiclePagination
@@ -69,3 +71,10 @@ class VehicleImageViewSet(ModelViewSet):
     queryset = VehicleImage.objects.all()
     serializer_class = VehicleImageSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+def proxy_image(request, image_url):
+    try:
+        response = requests.get(image_url, timeout=5)
+        return HttpResponse(response.content, content_type=response.headers.get('Content-Type', 'image/jpeg'))
+    except Exception:
+        return HttpResponse(status=404)
