@@ -45,7 +45,7 @@ mit dem Backend (Django). Die Datenbank liegt als SQLite-Datei im Backend-Contai
 │  │ Login    │ │ Hero     │ │ useFahrzeuge (API)   │ │
 │  │ Dashboard│ │ Footer   │ │ useNotification      │ │
 │  └──────────┘ └──────────┘ └──────────────────────┘ │
-│                    │ HTTP (JSON)                     │
+│                    │ HTTP (JSON)                    │
 └────────────────────┼────────────────────────────────┘
                      │ Port 5173 → 8000 (Proxy)
 ┌────────────────────┼────────────────────────────────┐
@@ -61,9 +61,9 @@ mit dem Backend (Django). Die Datenbank liegt als SQLite-Datei im Backend-Contai
 │  └──────────────────────────────────────────────┘   │
 │                    │                                │
 │  ┌─────────────────┴──────────────────────────┐     │
-│  │  SQLite-Datenbank (backend/db.sqlite3)      │     │
-│  │  Tabellen: vehicles_vehicle, accounts_user  │     │
-│  │  Ort im Container: /app/db.sqlite3          │     │
+│  │  SQLite-Datenbank (backend/db.sqlite3)     │     │
+│  │  Tabellen: vehicles_vehicle, accounts_user │     │
+│  │  Ort im Container: /app/db.sqlite3         │     │
 │  └────────────────────────────────────────────┘     │
 └────────────────────────────────────────────────────┘
 ```
